@@ -23,6 +23,12 @@ def render(text):
     text = re.sub(r"!Video:&quot;(.+)&quot;", r"<video src='\1'>", text)    
     text = re.sub(r"!URL:&quot;(.+)&quot;", r"<a href='\1'>\1</a>", text)    
     
+    if session.get("ngword") is not None:
+        for i in session.get("ngword", "").split():
+            if i in text:
+                text = "<b style='color:red'>【NGワードが含まれています】</b>"
+                break
+
     text = text.replace("\n","<br>")
     return text
 
@@ -50,7 +56,15 @@ def index():
 
 @app.route("/setting", methods=["GET","POST"])
 def setting():
-    return render_template("setting.html")
+    if request.method == "POST":
+        session["ngword"] = request.form.get("ngword", "")
+        session["hide_id"] = request.form.get("hide_id","off")
+        session["hide_name"] = request.form.get("hide_name","off")
+        
+    return render_template("setting.html", ngword=session.get("ngword", ""),
+                           hide_id=(session.get("hide_id", "off") == "on"),
+                           hide_name=(session.get("hide_name", "off") == "on"))
+
 
 @app.route("/<instance_id>/")
 def bbs(instance_id):
@@ -138,7 +152,10 @@ def viewthread(instance_id, thrid):
         s.close()
         
         thread = json.loads(buf)
-        return render_template("thread.html", thread=thread, instance_id=instance_id, render=render)
+        return render_template("thread.html", thread=thread, 
+                               instance_id=instance_id, render=render,
+                               hide_id = session.get("hide_id") == "on",
+                               hide_name = session.get("hide_name", "off") == "on")
             
     else:
         return "インスタンスが登録されていません"   
@@ -200,10 +217,14 @@ def poll(instance_id, thrid):
         thread["contents"][-1]["index"] = len(thread["contents"])
         thread["contents"][-1]["text"] = render(thread["contents"][-1]["text"])
         
+        if session.get("hide_name", "off") == "on":
+            thread["contents"][-1]["name"] = "名無し"
+        
         return thread["contents"][-1]
             
     else:
         return "インスタンスが登録されていません"   
+
 
 
 

@@ -23,16 +23,15 @@
             <a href="/" class="btn btn-secondary btn-sm">VEV</a>
 
             <hr>
-
             <!-- スレッド内容 -->
             <div id="thr">
                 {% for item in thread.contents %}
                 <div class="response body" id="r{{loop.index}}">
                     <strong><a onclick="reply('{{loop.index}}')" class="body reply-button text-primary">{{loop.index}}</a>:
-                        <span class="body">{{item.name}}</span>　
-                        <small class="body ">{{item.timestamp}}　{{item.id}}</small>
+                        <span class="body">{% if not hide_name %}{{item.name}}{% else %}名無し{% endif %}</span>　
+                        <small class="body ">{{item.timestamp}}{% if not hide_id %}　{{item.id}}{% endif %}</small>
                     </strong>
-                    <pre class="body">{{render(item.text)|safe}}</pre>
+                    <pre class="body" id="r{{loop.index}}b">{{render(item.text)|safe}}</pre>
                 </div>
                 {% endfor %}
             </div>
@@ -62,16 +61,22 @@
     <br>
     <!-- フッター -->
     <div class="bottom-nav mt-4 text-center bg-dark text-white py-3 position-fixed" style="bottom:0px; width:100vw">
-        <a href="/{{instance_id}}/" class="btn btn-primary">🏡 ホーム</a>
+        <button onclick="history.back()" class="btn btn-secondary">◀</button>
         <span class="mx-2"></span>
-        <a href="/" class="btn btn-primary">🏡 VEV</a>
+        <button onclick="history.forward()" class="btn btn-secondary">▶</button>
         <span class="mx-2"></span>
-        <button id="dark-change" class="btn btn-secondary">ダークモード</button>
-
+        <a href="/{{instance_id}}/" class="btn btn-primary">🏡</a>
+        <span class="mx-2"></span>
+        <a href="/" class="btn btn-primary">V</a>
+        <span class="mx-2"></span>
+        <a href="/setting" class="btn btn-danger">⚙</a>
+        <span class="mx-2"></span>
+        <button id="dark-change" class="btn btn-secondary">🌙</button>
     </div>
-
+    <audio src="/static/Notify.wav" id="notify"></audio>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" integrity="sha512-3j3VU6WC5rPQB4Ld1jnLV7Kd5xr+cq9avvhwqzbH/taCRNURoeEpoPBK9pDyeukwSxwRPJ8fDgvYXd6SkaZ2TA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/static/darkmode.js"></script>
     <script>
         $("#submit").click(() => {
             $.ajax({
@@ -94,14 +99,20 @@
                     var element = document.createElement("div");
                     element.className = "body response";
                     element.id = `r${data.index}`
+                    if ("{{ hide_id }}" == "True") {
+                        data.id = ""
+                    }
                     element.innerHTML = `
                         <strong><a onclick="reply('${data.index}')" class="reply-button text-primary body">${data.index}</a>:
                         <span class="body">${data.name}</span>　
                         <small class="body">${data.timestamp}　${data.id}</small>
                         </strong>
-                        <pre class="body">${data.text}</pre>
+                        <pre class="body" id="r${data.index}b">${data.text}</pre>
                     `;
                     $("#thr")[0].appendChild(element);
+                    $("#notify")[0].pause();
+                    $("#notify")[0].currentTime=0;
+                    $("#notify")[0].play();
                     dark_mode_change()
                     poll();
                 })
@@ -117,33 +128,6 @@
             $("#text").val(`>>${c}\n${$("#text").val()}`)
         }
 
-        var isdark = localStorage.getItem("darkmode") == "true"
-
-        function dark_mode_change() {
-            if ( isdark ) {
-                document.querySelectorAll(".body").forEach((d)=>{
-                    d.style.backgroundColor = "#fff"
-                    d.style.color = "#111"
-                })
-
-    
-            } else {
-                document.querySelectorAll(".body").forEach((d)=>{
-                    d.style.backgroundColor = "#222"
-                    d.style.color = "#fff"
-                    
-                })
-    
-            }
-        }
-        
-        dark_mode_change()
-
-        $("#dark-change").click(()=>{
-            isdark = !isdark
-            dark_mode_change()
-            localStorage.setItem("darkmode", isdark)
-        })
     </script>
 
 </body>

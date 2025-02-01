@@ -28,17 +28,36 @@
 }
 
 .bottom-nav {
-    background: #343a40;
+    background: rgba(0, 0, 0, 0.5);
     color: white;
     padding: 10px;
-    overflow-x: scroll;
     display: flex;
     vertical-align: middle;
+    flex-wrap: nowrap;
+    overflow-x: scroll;
+
+}
+
+.bottom-nav a {
+    min-width: 50px; /* 子要素の最小幅を指定（重要） */
+    max-height: 50px;
+    display: flex;
+    align-items: center;
     justify-content: center;
+    
+}
+
+.bottom-nav button {
+    min-width: 50px; /* 子要素の最小幅を指定（重要） */
+    max-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
 }
 
 a {
-    color: #05f
+    color: #0af
 }
 
 img {
@@ -50,3 +69,4 @@ video {
     width: 50vw;
     height:auto;
 }
+

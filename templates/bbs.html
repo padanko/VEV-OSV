@@ -73,44 +73,21 @@
     <!-- フッター -->
     <!-- フッター -->
     <div class="bottom-nav mt-4 text-center bg-dark text-white py-3 position-fixed" style="bottom:0px; width:100vw">
-        <a href="/{{instance_id}}/" class="btn btn-primary">🏡 ホーム</a>
+        <button onclick="history.back()" class="btn btn-secondary">◀</button>
         <span class="mx-2"></span>
-        <a href="/" class="btn btn-primary">🏡 VEV</a>
+        <button onclick="history.forward()" class="btn btn-secondary">▶</button>
         <span class="mx-2"></span>
-        <button id="dark-change" class="btn btn-secondary">ダークモード</button>
-
+        <a href="/{{instance_id}}/" class="btn btn-primary">🏡</a>
+        <span class="mx-2"></span>
+        <a href="/" class="btn btn-primary">V</a>
+        <span class="mx-2"></span>
+        <a href="/setting" class="btn btn-danger">⚙</a>
+        <span class="mx-2"></span>
+        <button id="dark-change" class="btn btn-secondary">🌙</button>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" integrity="sha512-3j3VU6WC5rPQB4Ld1jnLV7Kd5xr+cq9avvhwqzbH/taCRNURoeEpoPBK9pDyeukwSxwRPJ8fDgvYXd6SkaZ2TA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script>
-
-        var isdark = localStorage.getItem("darkmode") == "true"
-
-        function dark_mode_change() {
-            if ( isdark ) {
-                document.querySelectorAll(".body").forEach((d)=>{
-                    d.style.backgroundColor = "#fff"
-                    d.style.color = "#111"
-                })
-    
-            } else {
-                document.querySelectorAll(".body").forEach((d)=>{
-                    d.style.backgroundColor = "#222"
-                    d.style.color = "#fff"
-                    
-                })
-    
-            }
-        }
-        
-        dark_mode_change()
-
-        $("#dark-change").click(()=>{
-            isdark = !isdark
-            dark_mode_change()
-            localStorage.setItem("darkmode", isdark)
-        })
-    </script>
+    <script src="/static/darkmode.js"></script>
 
 </body>
 </body>
