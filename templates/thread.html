@@ -6,6 +6,7 @@
     <title>VEV</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/xmas.css">
 </head>
 <body class="body">
 
@@ -32,6 +33,7 @@
                         <small class="body ">{{item.timestamp}}{% if not hide_id %}　{{item.id}}{% endif %}</small>
                     </strong>
                     <pre class="body" id="r{{loop.index}}b">{{render(item.text)|safe}}</pre>
+                    <span id="r{{loop.index}}R" class="badge bg-success"></span>
                 </div>
                 {% endfor %}
             </div>
@@ -60,7 +62,7 @@
     <br>
     <br>
     <!-- フッター -->
-    <div class="bottom-nav mt-4 text-center bg-dark text-white py-3 position-fixed" style="bottom:0px; width:100vw">
+    <div class="bottom-nav mt-4 text-center bg-dark text-white py-3 position-fixed" style="bottom:0px; width:100vw" id="PAGE-2">
         <button onclick="history.back()" class="btn btn-secondary">◀</button>
         <span class="mx-2"></span>
         <button onclick="history.forward()" class="btn btn-secondary">▶</button>
@@ -103,17 +105,19 @@
                         data.id = ""
                     }
                     element.innerHTML = `
-                        <strong><a onclick="reply('${data.index}')" class="reply-button text-primary body">${data.index}</a>:
+                        <strong><a onclick="reply('${data.index}')" class="reply-button text-primary body" id="r${data.index}I">${data.index}</a>:
                         <span class="body">${data.name}</span>　
                         <small class="body">${data.timestamp}　${data.id}</small>
                         </strong>
                         <pre class="body" id="r${data.index}b">${data.text}</pre>
+                        <span id="r${data.index}R" class="badge bg-success"></span>
                     `;
                     $("#thr")[0].appendChild(element);
                     $("#notify")[0].pause();
                     $("#notify")[0].currentTime=0;
                     $("#notify")[0].play();
                     dark_mode_change()
+                    reply_render()
                     poll();
                 })
                 .catch((e) => {
@@ -127,6 +131,37 @@
         function reply(c) {
             $("#text").val(`>>${c}\n${$("#text").val()}`)
         }
+
+        function xmas_del() {
+            document.querySelectorAll(".snowflake").forEach((d)=>{
+                d.remove();
+            })
+        }
+
+        function reply_render() {
+            document.getElementById("thr").querySelectorAll("div").forEach((d, i)=>{
+                $(`#r${i}R`).html("")
+            })
+            document.getElementById("thr").querySelectorAll("div").forEach((d, i)=>{
+
+                var replys = $(`#r${i+1}b`).text().match(/>>([0-9]+)/g)
+                if (replys !== null) {
+                    console.log(replys)
+                    replys.forEach((e)=>{
+                        console.log(e.replace(">>",""))
+                        if ($(`#r${e.replace(">>","")}R`)[0].innerHTML == "") {
+                            $(`#r${e.replace(">>","")}R`)[0].innerHTML=`<a class="reply_from" href='#r${i+1}'>&gt;&gt;${i+1}</a>`
+                        } else {
+                            $(`#r${e.replace(">>","")}R`)[0].innerHTML+=`　<a class="reply_from" href='#r${i+1}'>&gt;&gt;${i+1}</a>`
+                        }
+                    })
+
+                } 
+
+            })
+        }
+
+        reply_render()
 
     </script>
 

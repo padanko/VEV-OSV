@@ -22,7 +22,10 @@ def render(text):
     text = re.sub(r"!Img:&quot;(.+)&quot;", r"<img src='\1'>", text)    
     text = re.sub(r"!Video:&quot;(.+)&quot;", r"<video src='\1'>", text)    
     text = re.sub(r"!URL:&quot;(.+)&quot;", r"<a href='\1'>\1</a>", text)    
+    text = re.sub(r"!IFR:&quot;(.+)&quot;", r"<iframe src='\1'></iframe>", text)    
     
+
+
     if session.get("ngword") is not None:
         for i in session.get("ngword", "").split():
             if i in text:
@@ -31,6 +34,7 @@ def render(text):
 
     text = text.replace("\n","<br>")
     return text
+
 
 def get_addr_from_instance_id(instance_id: str):
     servers = open("servers.txt","r").read().split("\n")
@@ -42,17 +46,31 @@ def get_addr_from_instance_id(instance_id: str):
         if instance_id == id_:
             return addr
 
+
+def is_mobile(ua):
+    mobile_pattern = re.compile(r"Mobile|Android|iPhone|iPad|iPod", re.IGNORECASE)
+    return bool(mobile_pattern.search(ua))
+
+
 def id_gen():
-    return "".join(random.Random(f"{request.headers.get("X-Forwarded-For","")} Z19 TwineViewer {datetime.datetime.now().strftime('%Y/%m/%d')}").choices(string.ascii_letters+string.digits, k=4))
+    c = "".join(random.Random(f"{request.headers.get("X-Forwarded-For","")} Z19 TwineViewer {datetime.datetime.now().strftime('%Y/%m/%d')}").choices(string.ascii_letters+string.digits, k=4))
     
+    if is_mobile(request.user_agent.string):
+        return "V:"+c
+    else:
+        return "V-"+c
+
+
 
 @app.route("/ifconfig")
 def ifconfig():
     return request.headers.get("X-Forwarded-For", "???")
 
+
 @app.route("/")
 def index():
     return render_template("index.html")
+
 
 @app.route("/setting", methods=["GET","POST"])
 def setting():
@@ -111,7 +129,7 @@ def makenewthread(instance_id):
                 {
                     "name": html.escape(request.form.get("name")).replace("<END>",""),
                     "text": html.escape(request.form.get("text")).replace("<END>",""),
-                    "id": "TV-"+id_gen(),
+                    "id": id_gen(),
                     "timestamp": datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
                 }
             ]
@@ -174,7 +192,7 @@ def makethrrsp(instance_id, thrid):
             "data": {
                 "name": html.escape(request.form.get("name")).replace("<END>",""),
                 "text": html.escape(request.form.get("text")).replace("<END>",""),
-                "id": "TV-"+id_gen(),
+                "id": id_gen(),
                 "timestamp": datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
             }
         }
@@ -227,5 +245,4 @@ def poll(instance_id, thrid):
 
 
 
-
-app.run("::", 80, True)
+app.run("localhost", 31415, True)

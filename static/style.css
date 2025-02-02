@@ -70,3 +70,41 @@ video {
     height:auto;
 }
 
+iframe {
+    border: none;
+    width: 60vw;
+    height: 50vh;
+}
+
+@media screen and (max-width: 480px) {
+    #PAGE-1 {
+        display:none
+    }
+    #PAGE-2 {
+    }
+}
+@media screen and (min-width: 481px) {
+    #PAGE-1 {
+    }
+    #PAGE-2 {
+        display:none
+    }
+}
+
+#DESKTOP {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100vw;
+    height:100vh;
+}
+
+body {
+    background-repeat: repeat-y;
+    background-size: cover;    
+}
+
+.reply_from {
+    color: white;
+    text-decoration: none;
+}
